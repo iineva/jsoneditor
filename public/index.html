@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>JSONEditor</title>
+
+    <link href="/lib/jsoneditor.min.css" rel="stylesheet" type="text/css" />
+    <script src="/lib/jsoneditor.min.js"></script>
+
+    <style type="text/css">
+      body {
+        font-family: sans-serif;
+      }
+
+      *,
+      html,
+      body {
+        padding: 0;
+        margin: 0;
+      }
+
+      body {
+        display: flex;
+      }
+
+      #jsoneditor1,
+      #jsoneditor2 {
+        display: inline-block;
+        padding: 0;
+        margin: 0;
+      }
+
+      #jsoneditor1 {
+        width: 50vw;
+        height: 100vh;
+        float: left;
+      }
+      #jsoneditor2 {
+        width: 50vw;
+        height: 100vh;
+        float: right;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="jsoneditor1"></div>
+    <div id="jsoneditor2"></div>
+
+    <script>
+      const CACHE_KEY = "jsoneditor-synchronize-editors";
+
+      // create editor 1
+      const editor1 = new JSONEditor(document.getElementById("jsoneditor1"), {
+        mode: "code",
+        onChangeText: function (jsonString) {
+          console.log("Saving data to localStorage");
+          localStorage.setItem(CACHE_KEY, jsonString);
+          editor2.updateText(jsonString);
+        },
+      });
+
+      // create editor 2
+      const editor2 = new JSONEditor(document.getElementById("jsoneditor2"), {
+        onChangeText: function (jsonString) {
+          editor1.updateText(jsonString);
+        },
+      });
+
+      // set initial data in both editors
+      let json = JSON.stringify({
+        array: [1, 2, 3],
+        boolean: true,
+        null: null,
+        number: 123,
+        object: { a: "b", c: "d" },
+        string: "Hello World",
+      });
+      const saved_json = localStorage.getItem(CACHE_KEY);
+      if (saved_json) {
+        json = saved_json;
+      }
+      editor1.updateText(json);
+      editor2.updateText(json);
+    </script>
+  </body>
+</html>
